@@ -1,5 +1,6 @@
 package com.samiul.tach.service;
 
+import com.samiul.tach.dto.LoginRequest;
 import com.samiul.tach.dto.SignupRequest;
 import com.samiul.tach.dto.UserResponse;
 import com.samiul.tach.model.User;
@@ -37,5 +38,20 @@ public class AuthService {
 
         return new UserResponse(savedUser);
 
+    }
+
+    public  UserResponse login(LoginRequest loginRequest, HttpServletResponse response) {
+        User user = userRepository.findByEmail(loginRequest.getEmail()).orElseThrow(() -> new IllegalArgumentException("User with this email does not exist."));
+
+        boolean isPasswordCorrect = passwordEncoder.matches(loginRequest.getPassword(), user.getPassword());
+
+        if (!isPasswordCorrect) {
+            throw new IllegalArgumentException("Invalid credentials.");
+        }
+
+        String token = jwtUtils.generateToken(user.getId());
+        jwtUtils.setToken(response, token);
+
+        return new UserResponse(user);
     }
 }

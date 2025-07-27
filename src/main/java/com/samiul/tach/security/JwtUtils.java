@@ -2,6 +2,7 @@ package com.samiul.tach.security;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -36,7 +37,15 @@ public class JwtUtils {
                 .getSubject();
     }
 
-    public void setTokenCookie(HttpServletResponse, String token) {
+    public void setToken(HttpServletResponse response, String token) {
+        Cookie cookie = new Cookie("token", token);
 
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(15 * 24 * 60 * 60);
+        cookie.setAttribute("SameSite", "None");
+
+        response.addCookie(cookie);
     }
 }
