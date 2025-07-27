@@ -6,6 +6,7 @@ import com.samiul.tach.dto.UserResponse;
 import com.samiul.tach.model.User;
 import com.samiul.tach.repository.UserRepository;
 import com.samiul.tach.security.JwtUtils;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -53,5 +54,16 @@ public class AuthService {
         jwtUtils.setToken(response, token);
 
         return new UserResponse(user);
+    }
+
+    public void logout(HttpServletResponse response){
+        Cookie cookie = new Cookie("jwt", null);
+        cookie.setMaxAge(0);
+        cookie.setPath("/");
+        cookie.setSecure(true);
+        cookie.setHttpOnly(true);
+        cookie.setAttribute("SameSite", "None");
+
+        response.addCookie(cookie);
     }
 }

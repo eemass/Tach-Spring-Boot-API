@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -34,5 +36,12 @@ public class AuthController {
         UserResponse userResponse = authService.login(request, response);
 
         return ResponseEntity.ok(userResponse);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletResponse response) {
+        authService.logout(response);
+
+        return ResponseEntity.ok(Map.of("message", "Logged out successfully."));
     }
 }

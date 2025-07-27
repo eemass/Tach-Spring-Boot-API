@@ -1,13 +1,47 @@
 package com.samiul.tach.config;
 
+import com.samiul.tach.repository.UserRepository;
+import com.samiul.tach.security.JwtAuthFilter;
+import com.samiul.tach.security.JwtUtils;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
+@RequiredArgsConstructor
 public class SecurityConfig {
+    private final JwtUtils jwtUtils;
+    private final UserRepository userRepository;
+
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                                   @Qualifier("customCorsConfigurationSource") CorsConfigurationSource corsConfigSource) throws Exception {
+
+        return http
+                .cors(cors -> cors.configurationSource(corsConfigSource))
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/api/auth/login", "/api/auth/signup", "/api/auth/logout").permitAll()
+                        .requestMatchers("/api/**").authenticated()
+                )
+                .addFilterBefore(
+                        new JwtAuthFilter(jwtUtils, userRepository),
+                        UsernamePasswordAuthenticationFilter.class
+                )
+                .build();
     }
 }

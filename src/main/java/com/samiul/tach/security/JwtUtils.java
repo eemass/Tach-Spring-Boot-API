@@ -38,7 +38,7 @@ public class JwtUtils {
     }
 
     public void setToken(HttpServletResponse response, String token) {
-        Cookie cookie = new Cookie("token", token);
+        Cookie cookie = new Cookie("jwt", token);
 
         cookie.setHttpOnly(true);
         cookie.setSecure(true);
