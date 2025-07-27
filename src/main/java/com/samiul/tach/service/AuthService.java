@@ -66,4 +66,8 @@ public class AuthService {
 
         response.addCookie(cookie);
     }
+
+    public UserResponse updateUser(String userId) {
+
+    }
 }
