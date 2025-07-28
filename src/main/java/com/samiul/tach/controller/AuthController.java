@@ -2,6 +2,7 @@ package com.samiul.tach.controller;
 
 import com.samiul.tach.dto.LoginRequest;
 import com.samiul.tach.dto.SignupRequest;
+import com.samiul.tach.dto.UpdateProfileRequest;
 import com.samiul.tach.dto.UserResponse;
 import com.samiul.tach.model.User;
 import com.samiul.tach.service.AuthService;
@@ -11,9 +12,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.Map;
 
 @RestController
@@ -54,8 +57,10 @@ public class AuthController {
         return ResponseEntity.ok(null);
     }
 
-    @PostMapping("/update-user")
-    public ResponseEntity<?> updateUser(@RequestBody UpdateUserRequest updateUserRequest) {
+    @PostMapping("/update-profile")
+    public ResponseEntity<?> updateProfile(@RequestBody UpdateProfileRequest updateProfileRequest, @AuthenticationPrincipal User currentUser) throws IOException {
+        UserResponse userResponse = authService.updateProfile(updateProfileRequest, currentUser);
 
+        return ResponseEntity.ok(userResponse);
     }
 }
